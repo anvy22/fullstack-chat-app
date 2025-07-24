@@ -9,15 +9,17 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  unreadCounts: {}, // stores unread counts per userId
+  isSubscribed: false, // Track subscription status
 
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/users");
-      set({ users: res.data || [] }); // Ensure it's always an array
+      set({ users: res.data || [] });
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch users");
-      set({ users: [] }); // Set empty array on error
+      set({ users: [] });
     } finally {
       set({ isUsersLoading: false });
     }
@@ -28,6 +30,11 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data || [] });
+
+      // Reset unread count when messages are fetched
+      const unreadCounts = { ...get().unreadCounts };
+      delete unreadCounts[userId];
+      set({ unreadCounts });
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch messages");
     } finally {
@@ -49,49 +56,81 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get(`/search/user?searchTerm=${searchTerm}`);
-      
-      // Handle different possible response structures
       let users = [];
+
       if (res.data?.users) {
-        // If backend returns { users: [...] }
         users = Array.isArray(res.data.users) ? res.data.users : [];
       } else if (Array.isArray(res.data)) {
-        // If backend returns users array directly
         users = res.data;
       } else {
         console.warn('Unexpected response structure:', res.data);
         users = [];
       }
-      
+
       set({ users });
     } catch (error) {
       toast.error(error.response?.data?.message || "Search failed");
-      set({ users: [] }); // Set empty array on error
+      set({ users: [] });
     } finally {
       set({ isUsersLoading: false });
     }
   },
 
   subscribeToMessages: () => {
-    const { selectedUser } = get();
-    if (!selectedUser) return;
-
+    const { isSubscribed } = get();
+    
+    // Prevent multiple subscriptions
+    if (isSubscribed) return;
+    
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
 
     socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
+      const { selectedUser, messages, unreadCounts, users } = get();
 
-      set({
-        messages: [...get().messages, newMessage],
-      });
+      // If user is currently chatting, append message directly
+      if (selectedUser && newMessage.senderId === selectedUser._id) {
+        set({ messages: [...messages, newMessage] });
+      } else {
+        // Increment unread count for users not currently selected
+        const current = unreadCounts[newMessage.senderId] || 0;
+        set({
+          unreadCounts: {
+            ...unreadCounts,
+            [newMessage.senderId]: current + 1,
+          },
+        });
+
+        // Move user with new message to top of the list
+        const updatedUsers = [...users];
+        const userIndex = updatedUsers.findIndex(user => user._id === newMessage.senderId);
+        
+        if (userIndex > 0) { // Only move if user exists and is not already first
+          const userToMove = updatedUsers.splice(userIndex, 1)[0];
+          updatedUsers.unshift(userToMove);
+          set({ users: updatedUsers });
+        }
+      }
     });
+
+    set({ isSubscribed: true });
   },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
+    if (socket) {
+      socket.off("newMessage");
+    }
+    set({ isSubscribed: false });
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => {
+    const unreadCounts = { ...get().unreadCounts };
+
+    if (selectedUser?._id) {
+      delete unreadCounts[selectedUser._id];
+    }
+
+    set({ selectedUser, unreadCounts });
+  },
 }));

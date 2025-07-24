@@ -1,10 +1,20 @@
-import { X , Sparkles } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
+import { useAIStore } from "../store/useAIStore";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
+  const { generateNoteFromChat, isGeneratingNote } = useAIStore();
+  
+  const handleSubmit = async (userId) => {
+    try {
+      await generateNoteFromChat(userId);
+    } catch (error) {
+      console.error("Failed to generate note:", error);
+    }
+  };
 
   return (
     <div className="p-2.5 border-b border-base-300">
@@ -27,13 +37,30 @@ const ChatHeader = () => {
         </div>
 
         <div className="flex items-center justify-between gap-7 pr-3">
-          <Sparkles />
-          <button onClick={() => setSelectedUser(null)}>
-             <X />
+          <button 
+            onClick={() => handleSubmit(selectedUser._id)}
+            disabled={isGeneratingNote}
+            className={`p-1 rounded hover:bg-base-200 transition-colors ${
+              isGeneratingNote ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
+            title="Generate AI notes from chat"
+          >
+            <Sparkles 
+              className={`w-5 h-5 ${isGeneratingNote ? 'animate-pulse text-primary' : 'text-base-content/70 hover:text-primary'}`} 
+            />
+          </button>
+          
+          <button 
+            onClick={() => setSelectedUser(null)}
+            className="p-1 rounded hover:bg-base-200 transition-colors"
+            title="Close chat"
+          >
+            <X className="w-5 h-5 text-base-content/70 hover:text-error" />
           </button>
         </div>
       </div>
     </div>
   );
 };
+
 export default ChatHeader;

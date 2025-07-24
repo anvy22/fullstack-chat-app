@@ -131,7 +131,7 @@ const NotePage = () => {
       <div className="md:w-80 w-full md:h-auto h-[50vh] overflow-y-auto bg-base-200 border-b md:border-b-0 md:border-r border-base-300 flex-shrink-0">
         <div className="p-4 border-b border-base-300">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">📝 Notes</h2>
+            <h2 className="text-xl font-bold">Notes</h2>
             <button onClick={handleNewNote} className="btn btn-primary btn-sm">
               <Plus size={16} /> <span className="hidden sm:inline">New</span>
             </button>
@@ -377,7 +377,6 @@ const NotePage = () => {
         ) : (
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="text-center text-gray-500">
-              <div className="text-6xl mb-4">📝</div>
               <h3 className="text-xl font-semibold mb-2">
                 Select a note to view
               </h3>
