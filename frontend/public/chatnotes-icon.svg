@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chat Bubble -->
+  <path d="M30 40c0-11 9-20 20-20h100c11 0 20 9 20 20v60c0 11-9 20-20 20H70l-25 20v-20H50c-11 0-20-9-20-20V40z" 
+        fill="#4F46E5" stroke="#3730A3" stroke-width="3" />
+
+  <!-- Lines (messages) -->
+  <rect x="55" y="50" width="90" height="10" rx="5" fill="white" />
+  <rect x="55" y="70" width="70" height="10" rx="5" fill="white" />
+  <rect x="55" y="90" width="50" height="10" rx="5" fill="white" />
+
+  <!-- Note Icon (top-right) -->
+  <rect x="130" y="15" width="40" height="50" rx="5" fill="#FACC15" stroke="#D97706" stroke-width="2" />
+  <line x1="135" y1="30" x2="165" y2="30" stroke="#92400E" stroke-width="2"/>
+  <line x1="135" y1="40" x2="165" y2="40" stroke="#92400E" stroke-width="2"/>
+</svg>
