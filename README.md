@@ -30,6 +30,9 @@
 
 `ChatNotes` is a robust full-stack application designed to revolutionize digital communication and knowledge management. It integrates real-time private messaging with an innovative AI-powered note-taking system, all within a sleek, user-friendly interface. This project aims to provide a unified platform where conversations seamlessly transform into organized, actionable notes, enhancing productivity for individuals and teams alike.
 
+
+### Live Site : [ChatNotes](https://fullstack-chat-app-ld75.onrender.com)
+
 ## ✨ Features
 
 *   💬 **Real-time Messaging**: Engage in instant, private conversations with other users, supporting both text and image messages for rich communication. Messages are delivered instantly via Socket.io.
