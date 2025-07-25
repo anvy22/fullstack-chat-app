@@ -57,7 +57,7 @@ const Sidebar = () => {
 
       <SearchBar />
 
-      <div className="py-3">
+      <div className="py-3 md:block hidden">
         <label className="cursor-pointer flex items-center gap-2">
           <input
             type="checkbox"
@@ -72,7 +72,7 @@ const Sidebar = () => {
         </span>
       </div>
 
-      <div className="overflow-y-auto w-full py-3">
+      <div className="overflow-y-auto w-full py-3 ">
         {filteredUsers.map((user) => (
           <button
             key={user._id}
@@ -101,7 +101,7 @@ const Sidebar = () => {
               )}
             </div>
 
-            <div className="text-left min-w-0">
+            <div className="text-left min-w-0 md:block hidden">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
